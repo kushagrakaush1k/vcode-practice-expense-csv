@@ -1,0 +1,6 @@
+[
+  { "date": "2026-11-02", "amount": 12.5, "category": "food", "note": "lunch with the team" },
+  { "date": "2026-11-03", "amount": 40, "category": "transport", "note": "monthly metro card" },
+  { "date": "2026-11-05", "amount": 7.25, "category": "food", "note": "coffee, beans" },
+  { "date": "2026-11-09", "amount": 120, "category": "bills", "note": "internet" }
+]

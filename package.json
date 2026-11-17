@@ -1,0 +1,14 @@
+{
+  "name": "expense-tracker",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "Tiny command-line expense tracker",
+  "scripts": {
+    "start": "node src/cli.ts",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=23.6"
+  }
+}
