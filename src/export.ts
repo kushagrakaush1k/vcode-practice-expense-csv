@@ -30,10 +30,17 @@ export function exportJson(expenses: Expense[], outPath = 'expenses-export.json'
   return outPath;
 }
 
+function localDateString(date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 /** Writes all expenses as CSV and returns the path written. */
 export function exportCsv(
   expenses: Expense[],
-  outPath = `expenses-${new Date().toISOString().slice(0, 10)}.csv`,
+  outPath = `expenses-${localDateString()}.csv`,
 ): string {
   const header = CSV_COLUMNS.join(',');
   const rows = expenses.map((e) => {

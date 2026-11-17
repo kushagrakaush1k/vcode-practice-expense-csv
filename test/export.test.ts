@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { CsvColumn, exportCsv, exportJson } from '../src/export.ts';
@@ -30,4 +30,29 @@ test('exportCsv writes expenses with amount,date,category,note header and escape
       '',
     ].join('\n'),
   );
+});
+
+test('exportCsv defaults filename to expenses-<local YYYY-MM-DD>.csv', () => {
+  const now = new Date();
+  const expectedDate = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+  ].join('-');
+  const expectedFilename = `expenses-${expectedDate}.csv`;
+
+  const cwd = process.cwd();
+  const tempDir = mkdtempSync(join(tmpdir(), 'exp-cwd-'));
+  try {
+    process.chdir(tempDir);
+    const written = exportCsv([{ date: '2026-11-02', amount: 5, category: 'food' }]);
+    assert.equal(written, expectedFilename);
+    assert.equal(
+      readFileSync(join(tempDir, expectedFilename), 'utf8'),
+      'amount,date,category,note\n5.00,2026-11-02,food,\n',
+    );
+  } finally {
+    process.chdir(cwd);
+    rmSync(tempDir, { recursive: true, force: true });
+  }
 });
