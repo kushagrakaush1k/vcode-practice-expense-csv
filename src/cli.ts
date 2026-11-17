@@ -1,5 +1,5 @@
 import { addExpense, loadExpenses, saveExpenses, totalsByCategory } from './expenses.ts';
-import { exportJson } from './export.ts';
+import { exportCsv, exportJson } from './export.ts';
 
 const [command, ...args] = process.argv.slice(2);
 
@@ -27,6 +27,10 @@ switch (command) {
     console.log(`wrote ${exportJson(loadExpenses())}`);
     break;
   }
+  case 'export-csv': {
+    console.log(`wrote ${exportCsv(loadExpenses())}`);
+    break;
+  }
   default:
-    console.log('usage: npm start -- <list | add <amount> <category> [note] | total | export>');
+    console.log('usage: npm start -- <list | add <amount> <category> [note] | total | export | export-csv>');
 }
