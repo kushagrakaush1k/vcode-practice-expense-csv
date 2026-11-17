@@ -24,9 +24,9 @@ test('exportCsv writes expenses with amount,date,category,note header and escape
     readFileSync(out, 'utf8'),
     [
       `${CsvColumn.Amount},${CsvColumn.Date},${CsvColumn.Category},${CsvColumn.Note}`,
-      '12.5,2026-11-02,food,lunch with the team',
+      '12.50,2026-11-02,food,lunch with the team',
       '7.25,2026-11-05,food,"coffee, ""beans"""',
-      '120,2026-11-09,bills,',
+      '120.00,2026-11-09,bills,',
       '',
     ].join('\n'),
   );

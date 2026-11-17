@@ -24,13 +24,16 @@ switch (command) {
     break;
   }
   case 'export': {
-    console.log(`wrote ${exportJson(loadExpenses())}`);
-    break;
-  }
-  case 'export-csv': {
-    console.log(`wrote ${exportCsv(loadExpenses())}`);
+    const [format = 'json'] = args;
+    if (format === 'csv') {
+      console.log(`wrote ${exportCsv(loadExpenses())}`);
+    } else if (format === 'json') {
+      console.log(`wrote ${exportJson(loadExpenses())}`);
+    } else {
+      throw new Error(`unknown export format: ${format}`);
+    }
     break;
   }
   default:
-    console.log('usage: npm start -- <list | add <amount> <category> [note] | total | export | export-csv>');
+    console.log('usage: npm start -- <list | add <amount> <category> [note] | total | export [json|csv]>');
 }

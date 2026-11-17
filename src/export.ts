@@ -31,11 +31,14 @@ export function exportJson(expenses: Expense[], outPath = 'expenses-export.json'
 }
 
 /** Writes all expenses as CSV and returns the path written. */
-export function exportCsv(expenses: Expense[], outPath = 'expenses-export.csv'): string {
+export function exportCsv(
+  expenses: Expense[],
+  outPath = `expenses-${new Date().toISOString().slice(0, 10)}.csv`,
+): string {
   const header = CSV_COLUMNS.join(',');
   const rows = expenses.map((e) => {
     const values: Record<CsvColumn, string> = {
-      [CsvColumn.Amount]: String(e.amount),
+      [CsvColumn.Amount]: e.amount.toFixed(2),
       [CsvColumn.Date]: e.date,
       [CsvColumn.Category]: e.category,
       [CsvColumn.Note]: e.note ?? '',
