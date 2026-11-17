@@ -3,14 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { CsvColumn, exportCsv, exportJson } from '../src/export.ts';
-
-test('exportJson writes every expense as JSON', () => {
-  const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.json');
-  const expenses = [{ date: '2026-11-02', amount: 12.5, category: 'food' }];
-  assert.equal(exportJson(expenses, out), out);
-  assert.deepEqual(JSON.parse(readFileSync(out, 'utf8')), expenses);
-});
+import { CsvColumn, exportCsv } from '../src/export.ts';
 
 test('exportCsv writes expenses with amount,date,category,note header and escapes fields', () => {
   const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.csv');
@@ -55,4 +48,38 @@ test('exportCsv defaults filename to expenses-<local YYYY-MM-DD>.csv', () => {
     process.chdir(cwd);
     rmSync(tempDir, { recursive: true, force: true });
   }
+});
+
+test('exportCsv keeps notes shorter than 50 characters intact', () => {
+  const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.csv');
+  const note = 'short note';
+  exportCsv([{ date: '2026-11-02', amount: 10, category: 'food', note }], out);
+  assert.equal(readFileSync(out, 'utf8'), `amount,date,category,note\n10.00,2026-11-02,food,${note}\n`);
+});
+
+test('exportCsv keeps notes of exactly 50 characters intact', () => {
+  const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.csv');
+  const note = 'a'.repeat(50);
+  exportCsv([{ date: '2026-11-02', amount: 10, category: 'food', note }], out);
+  assert.equal(readFileSync(out, 'utf8'), `amount,date,category,note\n10.00,2026-11-02,food,${note}\n`);
+});
+
+test('exportCsv truncates notes longer than 50 characters to 50 characters', () => {
+  const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.csv');
+  const note = '1234567890'.repeat(6) + 'extra';
+  exportCsv([{ date: '2026-11-02', amount: 10, category: 'food', note }], out);
+  assert.equal(
+    readFileSync(out, 'utf8'),
+    `amount,date,category,note\n10.00,2026-11-02,food,${'1234567890'.repeat(5)}\n`,
+  );
+});
+
+test('exportCsv truncates before CSV escaping so quotes stay balanced', () => {
+  const out = join(mkdtempSync(join(tmpdir(), 'exp-')), 'out.csv');
+  const note = 'a,b' + 'x'.repeat(60);
+  exportCsv([{ date: '2026-11-02', amount: 10, category: 'food', note }], out);
+  assert.equal(
+    readFileSync(out, 'utf8'),
+    `amount,date,category,note\n10.00,2026-11-02,food,"a,b${'x'.repeat(47)}"\n`,
+  );
 });

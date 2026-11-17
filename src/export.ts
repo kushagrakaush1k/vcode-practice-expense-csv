@@ -44,11 +44,13 @@ export function exportCsv(
 ): string {
   const header = CSV_COLUMNS.join(',');
   const rows = expenses.map((e) => {
+    // Truncate notes to 50 characters because our spreadsheet truncates/breaks on longer notes.
+    const note = (e.note ?? '').slice(0, 50);
     const values: Record<CsvColumn, string> = {
       [CsvColumn.Amount]: e.amount.toFixed(2),
       [CsvColumn.Date]: e.date,
       [CsvColumn.Category]: e.category,
-      [CsvColumn.Note]: e.note ?? '',
+      [CsvColumn.Note]: note,
     };
     return CSV_COLUMNS.map((col) => escapeCsvField(values[col])).join(',');
   });
